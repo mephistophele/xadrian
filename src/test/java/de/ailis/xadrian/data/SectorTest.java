@@ -54,4 +54,17 @@ public class SectorTest
         assertEquals(-1, sectorFactory.getSector(9, 14).getDistance(
             sectorFactory.getSector(16, 11)));
     }
+    
+    @Test
+    public void testGetAsteroids(){
+        assertEquals(4, sectorFactory.getSector(0,0).getAsteroids().length);
+        assertEquals(0, sectorFactory.getSector(11, 7).getAsteroids().length);
+    }
+    
+    @Test
+    public void testGetIceAsteroids(){
+        Asteroid[] asteroids = sectorFactory.getSector(14, 6).getIceAsteroids();
+        assertEquals(1, asteroids.length);
+        assertEquals(17, asteroids[0].getYield());
+    }
 }
