@@ -66,6 +66,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
         ICE;
 
         /**
+         * @return 
          * @see java.lang.Enum#toString()
          */
         @Override
@@ -109,12 +110,17 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     public SectorSelector(final Game game)
     {
         this.game = game;
+        initComponents();
+    }
+    
+    private void initComponents(){
         setPreferredSize(new Dimension(650, 512));
         addMouseMotionListener(this);
         addMouseListener(this);
     }
 
     /**
+     * @param graphics
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
     @Override
@@ -353,6 +359,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see java.awt.event.MouseMotionListener#mouseDragged(MouseEvent)
      */
     @Override
@@ -362,6 +369,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see java.awt.event.MouseMotionListener#mouseMoved(MouseEvent)
      */
     @Override
@@ -383,6 +391,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see MouseListener#mouseClicked(MouseEvent)
      */
     @Override
@@ -392,6 +401,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see MouseListener#mouseEntered(MouseEvent)
      */
     @Override
@@ -401,6 +411,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see MouseListener#mouseExited(MouseEvent)
      */
     @Override
@@ -410,6 +421,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see MouseListener#mousePressed(MouseEvent)
      */
     @Override
@@ -419,6 +431,7 @@ public class SectorSelector extends JComponent implements MouseMotionListener,
     }
 
     /**
+     * @param e
      * @see MouseListener#mouseReleased(MouseEvent)
      */
     @Override

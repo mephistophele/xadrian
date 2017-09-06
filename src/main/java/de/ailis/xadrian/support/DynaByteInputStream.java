@@ -20,7 +20,7 @@ import java.io.InputStream;
 public class DynaByteInputStream extends InputStream
 {
     /** The original input stream. */
-    private InputStream stream;
+    private final InputStream stream;
 
     /**
      * Constructor.
@@ -34,6 +34,8 @@ public class DynaByteInputStream extends InputStream
     }
 
     /**
+     * @return 
+     * @throws java.io.IOException
      * @see java.io.InputStream#read()
      */
     @Override

@@ -38,10 +38,10 @@ public class WareFactory implements Serializable
     private final Game game;
 
     /** The ware map (for quick ID navigation) */
-    private final Map<String, Ware> wareMap = new HashMap<String, Ware>();
+    private final Map<String, Ware> wareMap = new HashMap<>();
 
     /** The wares (sorted) */
-    private final SortedSet<Ware> wares = new TreeSet<Ware>();
+    private final SortedSet<Ware> wares = new TreeSet<>();
 
     /**
      * Constructor.

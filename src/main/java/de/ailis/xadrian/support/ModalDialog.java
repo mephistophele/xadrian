@@ -69,22 +69,16 @@ public abstract class ModalDialog extends JDialog
     };
 
     /** Listens for escape key press and cancels the dialog */
-    private final ActionListener escKeyListener = new ActionListener()
-    {
-        /** @see ActionListener#actionPerformed(ActionEvent) */
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-            cancel();
-        }
-    };
+    private final ActionListener escKeyListener = (final ActionEvent e) -> {
+        cancel();
+    } /** @see ActionListener#actionPerformed(ActionEvent) */ ;
 
     /** The dialog actions */
-    private final Map<Result, Action> actions = new HashMap<Result, Action>();
+    private final Map<Result, Action> actions = new HashMap<>();
 
     /** The dialog buttons */
     private final Map<Result, JButton> buttons =
-        new HashMap<Result, JButton>();
+        new HashMap<>();
 
     /**
      * List with dialog actions which are displayed as buttons in the button
@@ -107,7 +101,7 @@ public abstract class ModalDialog extends JDialog
      * @param results
      *            The available results to create
      */
-    public void init(final String id, final Result... results)
+    public final void init(final String id, final Result... results)
     {
         // Initialize the non-visual parts of the dialog
         init();
@@ -184,12 +178,12 @@ public abstract class ModalDialog extends JDialog
     {
         Result cancelResult = null;
         Result defaultResult = null;
-        for (final Result result: this.buttons.keySet())
+        for (final Result buttonResult: this.buttons.keySet())
         {
-            if (cancelResult == null || result == Result.CANCEL
-                || result == Result.NO) cancelResult = result;
-            if (defaultResult == null || result == Result.OK
-                || result == Result.YES) defaultResult = result;
+            if (cancelResult == null || buttonResult == Result.CANCEL
+                || buttonResult == Result.NO) cancelResult = buttonResult;
+            if (defaultResult == null || buttonResult == Result.OK
+                || buttonResult == Result.YES) defaultResult = buttonResult;
         }
         getRootPane().setDefaultButton(this.buttons.get(defaultResult));
         this.cancelButton = this.buttons.get(cancelResult);
@@ -222,7 +216,7 @@ public abstract class ModalDialog extends JDialog
                 final JButton button = new JButton(action);
                 buttonPanel.add(button);
 
-                KeyStroke ks = null;
+                KeyStroke ks;
                 final InputMap imap = button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
                 final ActionMap amap = button.getActionMap();
 
@@ -236,17 +230,17 @@ public abstract class ModalDialog extends JDialog
         buttonPanel.add(Box.createHorizontalGlue());
 
         first = true;
-        for (final Result result: results)
+        for (final Result localResult: results)
         {
-            final Action action = new ModalDialogAction(this, result);
+            final Action action = new ModalDialogAction(this, localResult);
             final JButton button = new JButton(action);
             if (first)
                 first = false;
             else
                 buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
             buttonPanel.add(button);
-            this.actions.put(result, action);
-            this.buttons.put(result, button);
+            this.actions.put(localResult, action);
+            this.buttons.put(localResult, button);
         }
 
         // Add button panel to dialog

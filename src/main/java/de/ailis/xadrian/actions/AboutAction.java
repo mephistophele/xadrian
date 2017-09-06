@@ -33,6 +33,7 @@ public class AboutAction extends FrameAction<MainFrame>
     }
 
     /**
+     * @param e
      * @see ActionListener#actionPerformed(ActionEvent)
      */
     @Override

@@ -77,22 +77,13 @@ public final class TemplateFactory
     {
         try
         {
-            final StringWriter writer = new StringWriter();
             try
-            {
+            (StringWriter writer = new StringWriter()) {
                 template.process(rootMap, writer);
                 return writer.toString();
             }
-            finally
-            {
-                writer.close();
-            }
         }
-        catch (final TemplateException e)
-        {
-            throw new FreemarkerException("Unable to process template: " + e, e);
-        }
-        catch (final IOException e)
+        catch (final TemplateException | IOException e)
         {
             throw new FreemarkerException("Unable to process template: " + e, e);
         }

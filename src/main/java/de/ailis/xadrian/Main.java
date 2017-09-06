@@ -10,8 +10,6 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 
 import de.ailis.oneinstance.OneInstance;
-import de.ailis.oneinstance.OneInstanceListener;
-import de.ailis.xadrian.data.Game;
 import de.ailis.xadrian.data.factories.GameFactory;
 import de.ailis.xadrian.dialogs.AboutDialog;
 import de.ailis.xadrian.dialogs.ChangeQuantityDialog;
@@ -50,21 +48,11 @@ public class Main
         // to open more complexes in the already running Xadrian by
         // double-clicking the *.x3c files.
         final OneInstance oneInstance = OneInstance.getInstance();
-        oneInstance.addListener(new OneInstanceListener()
-        {
-            @Override
-            public boolean newInstanceCreated(final File workingDir, final String[] args)
-            {
-                SwingUtilities.invokeLater(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        MainFrame.open(workingDir, args);
-                    }
-                });
-                return false;
-            }
+        oneInstance.addListener((final File workingDir, final String[] args1) -> {
+            SwingUtilities.invokeLater(() -> {
+                MainFrame.open(workingDir, args1);
+            });
+            return false;
         });
         if (!oneInstance.register(Main.class, args)) System.exit(0);
 
@@ -86,13 +74,12 @@ public class Main
             SplashFrame.open();
 
             // Preload everything
-            for (Game game: GameFactory.getInstance().getGames())
-            {
+            GameFactory.getInstance().getGames().forEach(game -> {
                 game.getAddFactoryDialog();
                 game.getChangePricesDialog();
                 game.getChangeSunsDialog();
                 game.getSelectSectorDialog();
-            }
+            });
             AboutDialog.getInstance();
             OpenComplexDialog.getInstance();
             SaveComplexDialog.getInstance();
@@ -105,13 +92,8 @@ public class Main
 
             // Start the main frame and open the files specified on the
             // command line
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    MainFrame.start(args);
-                }
+            SwingUtilities.invokeLater(() -> {
+                MainFrame.start(args);
             });
         }
         catch (final Throwable t)

@@ -37,7 +37,7 @@ public class SectorComboBoxModel implements ComboBoxModel
         if (game == null)
             throw new IllegalArgumentException("game must be set");
         this.sectors =
-            new ArrayList<Sector>(game.getSectorFactory().getSectors());
+            new ArrayList<>(game.getSectorFactory().getSectors());
         this.sectors.add(0, null);
     }
 
@@ -51,6 +51,7 @@ public class SectorComboBoxModel implements ComboBoxModel
     }
 
     /**
+     * @param selectedItem
      * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
      */
     @Override

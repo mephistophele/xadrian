@@ -85,6 +85,7 @@ public class ChangeQuantityDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override

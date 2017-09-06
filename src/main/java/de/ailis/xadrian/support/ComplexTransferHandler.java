@@ -29,7 +29,7 @@ public final class ComplexTransferHandler extends TransferHandler
     private static final long serialVersionUID = 1L;
 
     /** The main frame. */
-    private MainFrame mainFrame;
+    private final MainFrame mainFrame;
 
     /**
      * Constructor.
@@ -43,6 +43,9 @@ public final class ComplexTransferHandler extends TransferHandler
     }
 
     /**
+     * @param component
+     * @param flavors
+     * @return 
      * @see javax.swing.TransferHandler#canImport(javax.swing.JComponent,
      *      java.awt.datatransfer.DataFlavor[])
      */
@@ -50,9 +53,7 @@ public final class ComplexTransferHandler extends TransferHandler
     public boolean canImport(final JComponent component,
         final DataFlavor[] flavors)
     {
-        for (int i = 0; i < flavors.length; i++)
-        {
-            DataFlavor flavor = flavors[i];
+        for (DataFlavor flavor : flavors) {
             if (flavor.equals(DataFlavor.javaFileListFlavor))
                 return true;
         }
@@ -60,21 +61,21 @@ public final class ComplexTransferHandler extends TransferHandler
     }
 
     /**
+     * @param transferable
+     * @return 
      * @see TransferHandler#importData(JComponent, Transferable)
      */
     @Override
     public boolean importData(JComponent comp, Transferable transferable)
     {
         DataFlavor[] flavors = transferable.getTransferDataFlavors();
-        for (int i = 0; i < flavors.length; i++)
-        {
-            DataFlavor flavor = flavors[i];
+        for (DataFlavor flavor : flavors) {
             try
             {
                 if (flavor.equals(DataFlavor.javaFileListFlavor))
                 {
                     for (File file : (List<File>) transferable
-                        .getTransferData(DataFlavor.javaFileListFlavor))
+                            .getTransferData(DataFlavor.javaFileListFlavor))
                     {
                         // Ignore non-files
                         if (!file.isFile()) continue;
@@ -91,7 +92,7 @@ public final class ComplexTransferHandler extends TransferHandler
             catch (IOException e)
             {
                 throw new DataException("Unable to read drag&drop data: " + e,
-                    e);
+                        e);
             }
             catch (UnsupportedFlavorException e)
             {

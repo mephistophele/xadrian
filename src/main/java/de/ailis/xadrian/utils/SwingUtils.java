@@ -45,6 +45,7 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.WString;
 
 import de.ailis.xadrian.support.Config;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * Static utility methods for common Swing tasks.
@@ -238,13 +239,8 @@ public final class SwingUtils
                     {
                         final JTextComponent text =
                             ((JTextComponent) e.getSource());
-                        SwingUtilities.invokeLater(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                text.selectAll();
-                            }
+                        SwingUtilities.invokeLater(() -> {
+                            text.selectAll();
                         });
                     }
                 }
@@ -259,13 +255,8 @@ public final class SwingUtils
                     final JTextComponent text =
                         ((DefaultEditor) ((JSpinner) e.getSource())
                             .getEditor()).getTextField();
-                    SwingUtilities.invokeLater(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            text.requestFocus();
-                        }
+                    SwingUtilities.invokeLater(() -> {
+                        text.requestFocus();
                     });
                 }
             }
@@ -311,7 +302,7 @@ public final class SwingUtils
                 installGtkPopupBugWorkaround();
                 return;
             }
-            catch (final Exception e)
+            catch (final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e)
             {
                 LOG.warn("Can't set theme " + theme +
                     ". Falling back to system look-and-feel. Reason: " + e, e);
@@ -324,7 +315,7 @@ public final class SwingUtils
                 .setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             installGtkPopupBugWorkaround();
         }
-        catch (final Exception e)
+        catch (final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
             LOG.warn("Can't set system look-and-feel. " +
                 "Falling back to default. Reason: " + e, e);
@@ -483,7 +474,7 @@ public final class SwingUtils
                 field.set(toolkit, appName);
             }
         }
-        catch (final Exception e)
+        catch (final NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e)
         {
             LOG.warn("Unable to set application name: " + e, e);
         }

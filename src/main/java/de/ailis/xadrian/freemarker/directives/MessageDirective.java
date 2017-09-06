@@ -24,6 +24,12 @@ import freemarker.template.TemplateModelException;
 public class MessageDirective extends BaseDirective
 {
     /**
+     * @param env
+     * @param params
+     * @param loopVars
+     * @param body
+     * @throws freemarker.template.TemplateException
+     * @throws java.io.IOException
      * @see TemplateDirectiveModel#execute(Environment, Map, TemplateModel[],
      *      TemplateDirectiveBody)
      */

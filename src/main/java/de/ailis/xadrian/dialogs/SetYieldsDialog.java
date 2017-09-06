@@ -56,7 +56,7 @@ public class SetYieldsDialog extends ModalDialog
     private JLabel label;
 
     /** The yields */
-    private final List<Integer> yields = new ArrayList<Integer>();
+    private final List<Integer> yields = new ArrayList<>();
 
     /** The game provider. */
     private final GameProvider gameProvider;
@@ -129,16 +129,16 @@ public class SetYieldsDialog extends ModalDialog
         infoPane.setPreferredSize(new Dimension(210, 240));
 
         // Create the split pane housing the factory pane and info pane
-        final JSplitPane splitPane = this.splitPane = new JSplitPane(
+        final JSplitPane localSplitPane = this.splitPane = new JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
             factoryPane, infoPane);
-        splitPane.setContinuousLayout(true);
-        splitPane.setName("asteroidsInfoSplitPane");
+        localSplitPane.setContinuousLayout(true);
+        localSplitPane.setName("asteroidsInfoSplitPane");
 
         // Create another container for just adding some border
         final JPanel contentPanel = new JPanel(new BorderLayout(5, 5));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPanel.add(splitPane, BorderLayout.CENTER);
+        contentPanel.add(localSplitPane, BorderLayout.CENTER);
         this.label = new JLabel();
         contentPanel.add(this.label, BorderLayout.NORTH);
 
@@ -175,6 +175,7 @@ public class SetYieldsDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override
@@ -184,13 +185,12 @@ public class SetYieldsDialog extends ModalDialog
         try
         {
             // Initialize the input pane with the yields
-            final StringBuilder yields = new StringBuilder();
-            for (final Integer yield : this.yields)
-            {
-                if (yields.length() > 0) yields.append(", ");
-                yields.append(yield);
-            }
-            this.inputPane.setText(yields.toString());
+            final StringBuilder localYields = new StringBuilder();
+            this.yields.stream().forEach((yield) -> {
+                if (localYields.length() > 0) localYields.append(", ");
+                localYields.append(yield);
+            });
+            this.inputPane.setText(localYields.toString());
             this.inputPane.requestFocus();
             this.inputPane.setCaretPosition(this.inputPane.getText().length());
 
@@ -204,12 +204,13 @@ public class SetYieldsDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#createDialogActions()
      */
     @Override
     protected List<Action> createDialogActions()
     {
-        final List<Action> dialogActions = new ArrayList<Action>();
+        final List<Action> dialogActions = new ArrayList<>();
         dialogActions.add(new ChangeSectorAction(this.gameProvider,
             this.asteroidsInfoPane, "sector"));
         return dialogActions;
@@ -275,7 +276,7 @@ public class SetYieldsDialog extends ModalDialog
         final Factory mineType =
             game.getFactoryFactory().getFactory("siliconMineL-teladi");
         final SetYieldsDialog dialog = new SetYieldsDialog(mineType);
-        final List<Integer> yields = new ArrayList<Integer>();
+        final List<Integer> yields = new ArrayList<>();
         yields.add(10);
         yields.add(25);
         yields.add(25);

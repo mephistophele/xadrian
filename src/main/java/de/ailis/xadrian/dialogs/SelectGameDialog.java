@@ -105,6 +105,7 @@ public class SelectGameDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override

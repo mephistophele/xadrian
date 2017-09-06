@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedSet;
 
 import javax.xml.bind.DatatypeConverter;
@@ -143,10 +142,10 @@ public class Complex implements Serializable, GameProvider
         this.game = game;
         this.suns = game.getSunFactory().getDefaultSun();
         this.name = name;
-        this.factories = new ArrayList<ComplexFactory>();
-        this.autoFactories = new ArrayList<ComplexFactory>();
-        this.customPrices = new HashMap<Ware, Integer>();
-        this.builtFactories = new HashMap<String, Integer>();
+        this.factories = new ArrayList<>();
+        this.autoFactories = new ArrayList<>();
+        this.customPrices = new HashMap<>();
+        this.builtFactories = new HashMap<>();
     }
 
     /**
@@ -189,10 +188,8 @@ public class Complex implements Serializable, GameProvider
     public int getTotalQuantity()
     {
         int quantity = 0;
-        for (final ComplexFactory factory: this.factories)
-            quantity += factory.getQuantity();
-        for (final ComplexFactory factory: this.autoFactories)
-            quantity += factory.getQuantity();
+        quantity = this.factories.stream().map((factory) -> factory.getQuantity()).reduce(quantity, Integer::sum);
+        quantity = this.autoFactories.stream().map((factory) -> factory.getQuantity()).reduce(quantity, Integer::sum);
         return quantity;
     }
 
@@ -204,12 +201,10 @@ public class Complex implements Serializable, GameProvider
     public long getTotalPrice()
     {
         long price = 0;
-        for (final ComplexFactory complexFactory: this.factories)
-            price += ((long) complexFactory.getQuantity())
-                * complexFactory.getFactory().getPrice();
-        for (final ComplexFactory complexFactory: this.autoFactories)
-            price += ((long) complexFactory.getQuantity())
-                * complexFactory.getFactory().getPrice();
+        price = this.factories.stream().map((complexFactory) -> ((long) complexFactory.getQuantity())
+                * complexFactory.getFactory().getPrice()).reduce(price, (accumulator, _item) -> accumulator + _item);
+        price = this.autoFactories.stream().map((complexFactory) -> ((long) complexFactory.getQuantity())
+                * complexFactory.getFactory().getPrice()).reduce(price, (accumulator, _item) -> accumulator + _item);
         return price + getTotalKitPrice();
     }
 
@@ -520,57 +515,53 @@ public class Complex implements Serializable, GameProvider
         if (!this.factories.isEmpty())
         {
             final Element factoriesE = root.addElement("complexFactories");
-            for (final ComplexFactory factory: this.factories)
-            {
+            this.factories.stream().forEach((factory) -> {
                 final Element factoryE = factoriesE
-                    .addElement("complexFactory");
+                        .addElement("complexFactory");
                 factoryE.addAttribute("factory", factory.getFactory().getId());
                 factoryE.addAttribute("disabled", Boolean.toString(factory
-                    .isDisabled()));
+                        .isDisabled()));
                 if (factory.getFactory().isMine())
                 {
                     final Element yieldsE = factoryE.addElement("yields");
-                    for (final Integer yield: factory.getYields())
-                    {
+                    factory.getYields().stream().forEach((yield) -> {
                         final Element yieldE = yieldsE.addElement("yield");
                         yieldE.setText(Integer.toString(yield));
-                    }
+                    });
                 }
                 else
                 {
                     factoryE.addAttribute("quantity", Integer.toString(factory
-                        .getQuantity()));
+                            .getQuantity()));
                 }
-            }
+            });
         }
         if (!this.customPrices.isEmpty())
         {
             final Element waresE = root.addElement("complexWares");
-            for (final Map.Entry<Ware, Integer> entry: this.customPrices
-                .entrySet())
-            {
-                final Ware ware = entry.getKey();
-                final int price = entry.getValue();
-                final Element wareE = waresE.addElement("complexWare");
-                wareE.addAttribute("ware", ware.getId());
-                wareE
-                    .addAttribute("use", Boolean.valueOf(price > 0)
-                        .toString());
-                wareE.addAttribute("price", Integer.toString(Math.abs(price)));
-            }
+            this.customPrices
+                    .entrySet().stream().forEach((entry) -> {
+                        final Ware ware = entry.getKey();
+                        final int price = entry.getValue();
+                        final Element wareE = waresE.addElement("complexWare");
+                        wareE.addAttribute("ware", ware.getId());
+                        wareE
+                                .addAttribute("use", Boolean
+                                        .toString(price > 0));
+                        wareE.addAttribute("price", Integer.toString(Math.abs(price)));
+            });
         }
 
         final Element shoppingListE = root.addElement("built");
         shoppingListE.addAttribute("kits", Integer.toString(this.builtKits));
-        for (final Entry<String, Integer> entry: this.builtFactories
-            .entrySet())
-        {
-            final String id = entry.getKey();
-            final int quantity = entry.getValue();
-            final Element factoryE = shoppingListE.addElement("factory");
-            factoryE.addAttribute("id", id);
-            factoryE.addAttribute("quantity", Integer.toString(quantity));
-        }
+        this.builtFactories
+                .entrySet().stream().forEach((entry) -> {
+                    final String id = entry.getKey();
+                    final int quantity = entry.getValue();
+                    final Element factoryE = shoppingListE.addElement("factory");
+                    factoryE.addAttribute("id", id);
+                    factoryE.addAttribute("quantity", Integer.toString(quantity));
+        });
 
         return document;
     }
@@ -647,7 +638,7 @@ public class Complex implements Serializable, GameProvider
             }
             else
             {
-                final List<Integer> yields = new ArrayList<Integer>();
+                final List<Integer> yields = new ArrayList<>();
                 for (final Object yieldItem: yieldsE.elements("yield"))
                 {
                     final Element yieldE = (Element) yieldItem;
@@ -706,7 +697,7 @@ public class Complex implements Serializable, GameProvider
     @SuppressWarnings("unchecked")
     private Collection<ComplexFactory> getAllFactories()
     {
-        return new MultiCollection<ComplexFactory>(this.factories,
+        return new MultiCollection<>(this.factories,
             this.autoFactories);
     }
 
@@ -717,19 +708,17 @@ public class Complex implements Serializable, GameProvider
      */
     public Collection<Product> getProductsPerHour()
     {
-        final Map<String, Product> products = new HashMap<String, Product>();
-        for (final ComplexFactory factory: getAllFactories())
-        {
-            final Product product = factory.getProductPerHour(getSuns());
+        final Map<String, Product> products = new HashMap<>();
+        getAllFactories().stream().map((factory) -> factory.getProductPerHour(getSuns())).forEach((product) -> {
             final Ware ware = product.getWare();
             final Product mapProduct = products.get(ware.getId());
             if (mapProduct == null)
                 products.put(ware.getId(), product);
             else
                 products.put(ware.getId(), new Product(ware, mapProduct
-                    .getQuantity()
-                    + product.getQuantity()));
-        }
+                        .getQuantity()
+                        + product.getQuantity()));
+        });
         return products.values();
     }
 
@@ -740,22 +729,20 @@ public class Complex implements Serializable, GameProvider
      */
     public Collection<Product> getResourcesPerHour()
     {
-        final Map<String, Product> resources = new HashMap<String, Product>();
-        for (final ComplexFactory factory: getAllFactories())
-        {
-            for (final Product resource: factory
-                .getResourcesPerHour(getSuns()))
-            {
-                final Ware ware = resource.getWare();
-                final Product mapResource = resources.get(ware.getId());
-                if (mapResource == null)
-                    resources.put(ware.getId(), resource);
-                else
-                    resources.put(ware.getId(), new Product(ware, mapResource
-                        .getQuantity()
-                        + resource.getQuantity()));
-            }
-        }
+        final Map<String, Product> resources = new HashMap<>();
+        getAllFactories().stream().forEach((factory) -> {
+            factory
+                    .getResourcesPerHour(getSuns()).stream().forEach((resource) -> {
+                        final Ware ware = resource.getWare();
+                        final Product mapResource = resources.get(ware.getId());
+                        if (mapResource == null)
+                            resources.put(ware.getId(), resource);
+                        else
+                            resources.put(ware.getId(), new Product(ware, mapResource
+                                    .getQuantity()
+                                    + resource.getQuantity()));
+                    });
+        });
         return resources.values();
     }
 
@@ -767,33 +754,31 @@ public class Complex implements Serializable, GameProvider
     public Collection<ComplexWare> getWares()
     {
         final Map<String, ComplexWare> wares =
-            new HashMap<String, ComplexWare>();
+            new HashMap<>();
 
         // Add the products
-        for (final Product product: getProductsPerHour())
-        {
+        getProductsPerHour().stream().forEach((product) -> {
             final Ware ware = product.getWare();
             final String wareId = ware.getId();
             wares.put(wareId, new ComplexWare(ware, product.getQuantity(), 0,
-                getWarePrice(ware)));
-        }
+                    getWarePrice(ware)));
+        });
 
         // Add the resources
-        for (final Product resource: getResourcesPerHour())
-        {
+        getResourcesPerHour().stream().forEach((resource) -> {
             final Ware ware = resource.getWare();
             final String wareId = ware.getId();
             ComplexWare complexWare = wares.get(wareId);
             if (complexWare == null)
                 complexWare = new ComplexWare(ware, 0, resource.getQuantity(),
-                    getWarePrice(ware));
+                        getWarePrice(ware));
             else
                 complexWare = new ComplexWare(ware, complexWare.getProduced(),
-                    resource.getQuantity(), getWarePrice(ware));
+                        resource.getQuantity(), getWarePrice(ware));
             wares.put(wareId, complexWare);
-        }
+        });
 
-        final List<ComplexWare> result = new ArrayList<ComplexWare>(wares
+        final List<ComplexWare> result = new ArrayList<>(wares
             .values());
         Collections.sort(result);
         return result;
@@ -809,10 +794,7 @@ public class Complex implements Serializable, GameProvider
         double profit;
 
         profit = 0;
-        for (final ComplexWare complexWare: getWares())
-        {
-            profit += complexWare.getProfit();
-        }
+        profit = getWares().stream().map((complexWare) -> complexWare.getProfit()).reduce(profit, (accumulator, _item) -> accumulator + _item);
         return profit;
     }
 
@@ -858,7 +840,7 @@ public class Complex implements Serializable, GameProvider
         final Config config = Config.getInstance();
         long currentPrice;
         long price;
-        final List<ComplexFactory> backup = new ArrayList<ComplexFactory>();
+        final List<ComplexFactory> backup = new ArrayList<>();
 
         // First of all remove all automatically added factories
         this.autoFactories.clear();
@@ -924,14 +906,13 @@ public class Complex implements Serializable, GameProvider
         this.shoppingList = null;
         this.builtKits = Math.max(0, Math.min(this.builtKits,
             getTotalQuantity() - 1));
-        for (final Map.Entry<String, Integer> entry: this.builtFactories
-            .entrySet())
-        {
-            final String id = entry.getKey();
-            final int max = getMaxFactories(id);
-            final int quantity = Math.min(entry.getValue(), max);
-            this.builtFactories.put(id, quantity);
-        }
+        this.builtFactories
+                .entrySet().stream().forEach((entry) -> {
+                    final String id = entry.getKey();
+                    final int max = getMaxFactories(id);
+                    final int quantity = Math.min(entry.getValue(), max);
+                    this.builtFactories.put(id, quantity);
+        });
         this.shoppingList = null;
     }
 
@@ -991,7 +972,7 @@ public class Complex implements Serializable, GameProvider
         // fulfilled.
         double need = complexWare.getMissing();
         final double oldNeed = need;
-        for (final ComplexFactory complexFactory: new ArrayList<ComplexFactory>(
+        for (final ComplexFactory complexFactory: new ArrayList<>(
             this.autoFactories))
         {
             if (complexFactory.getFactory().getProduct().getWare().equals(ware))
@@ -1012,20 +993,20 @@ public class Complex implements Serializable, GameProvider
         if (sizes.length == 0) return false;
 
         // Get the cheapest factories for the sizes
-        final Map<FactorySize, Factory> factories =
-            new HashMap<FactorySize, Factory>();
+        final Map<FactorySize, Factory> localFactories =
+            new HashMap<>();
         for (final FactorySize size: sizes)
         {
             if (race == null)
-                factories.put(size, factoryFactory.getCheapestFactory(ware,
+                localFactories.put(size, factoryFactory.getCheapestFactory(ware,
                     size));
             else
-                factories
+                localFactories
                     .put(size, factoryFactory.getFactory(ware, size, race));
         }
 
         // Get the smallest possible production quantity
-        final double minProduction = factories.get(sizes[0]).getProductPerHour(
+        final double minProduction = localFactories.get(sizes[0]).getProductPerHour(
             getSuns(), 0).getQuantity();
 
         // Iterate the available sizes (from largest to smallest) and add
@@ -1033,7 +1014,7 @@ public class Complex implements Serializable, GameProvider
         for (int i = sizes.length - 1; i >= 0; i--)
         {
             final FactorySize size = sizes[i];
-            final Factory factory = factories.get(size);
+            final Factory factory = localFactories.get(size);
             final double product = factory.getProductPerHour(getSuns(), 0)
                 .getQuantity();
 
@@ -1100,22 +1081,20 @@ public class Complex implements Serializable, GameProvider
     public Collection<Capacity> getCapacities()
     {
         final Map<String, Capacity> capacities =
-            new HashMap<String, Capacity>();
-        for (final ComplexFactory factory: getAllFactories())
-        {
-            for (final Capacity capacity: factory.getCapacities())
-            {
+            new HashMap<>();
+        getAllFactories().stream().forEach((factory) -> {
+            factory.getCapacities().stream().forEach((capacity) -> {
                 final Ware ware = capacity.getWare();
                 final Capacity mapCapacity = capacities.get(ware.getId());
                 if (mapCapacity == null)
                     capacities.put(ware.getId(), capacity);
                 else
                     capacities.put(ware.getId(), new Capacity(ware, mapCapacity
-                        .getQuantity()
-                        + capacity.getQuantity()));
-            }
-        }
-        final List<Capacity> result = new ArrayList<Capacity>(capacities
+                            .getQuantity()
+                            + capacity.getQuantity()));
+            });
+        });
+        final List<Capacity> result = new ArrayList<>(capacities
             .values());
         Collections.sort(result);
         return result;
@@ -1129,8 +1108,7 @@ public class Complex implements Serializable, GameProvider
     public long getTotalCapacity()
     {
         long total = 0;
-        for (final Capacity capacity: getCapacities())
-            total += capacity.getQuantity();
+        total = getCapacities().stream().map((capacity) -> capacity.getQuantity()).reduce(total, (accumulator, _item) -> accumulator + _item);
         return total;
     }
 
@@ -1142,8 +1120,7 @@ public class Complex implements Serializable, GameProvider
     public long getTotalStorageVolume()
     {
         long total = 0;
-        for (final Capacity capacity: getCapacities())
-            total += capacity.getVolume();
+        total = getCapacities().stream().map((capacity) -> capacity.getVolume()).reduce(total, (accumulator, _item) -> accumulator + _item);
         return total;
     }
 
@@ -1186,20 +1163,18 @@ public class Complex implements Serializable, GameProvider
 
         final ShoppingList list = new ShoppingList(this.sector == null ? null
             : this.sector.getNearestKitSellingSector(), this.builtKits);
-        for (final ComplexFactory factory: this.factories)
-        {
+        this.factories.stream().forEach((factory) -> {
             list.addItem(new ShoppingListItem(factory.getFactory(), factory
-                .getQuantity(), this.sector == null ? null : factory
-                .getFactory().getNearestManufacturer(this.sector),
-                getFactoriesBuilt(factory.getFactory())));
-        }
-        for (final ComplexFactory factory: this.autoFactories)
-        {
+                    .getQuantity(), this.sector == null ? null : factory
+                            .getFactory().getNearestManufacturer(this.sector),
+                    getFactoriesBuilt(factory.getFactory())));
+        });
+        this.autoFactories.stream().forEach((factory) -> {
             list.addItem(new ShoppingListItem(factory.getFactory(), factory
-                .getQuantity(), this.sector == null ? null : factory
-                .getFactory().getNearestManufacturer(this.sector),
-                getFactoriesBuilt(factory.getFactory())));
-        }
+                    .getQuantity(), this.sector == null ? null : factory
+                            .getFactory().getNearestManufacturer(this.sector),
+                    getFactoriesBuilt(factory.getFactory())));
+        });
 
         this.shoppingList = list;
         return list;
@@ -1450,10 +1425,9 @@ public class Complex implements Serializable, GameProvider
             final byte[] data =
                 DatatypeConverter.parseBase64Binary(templateCode.trim());
 
-            final InputStream stream = new DynaByteInputStream(
-                new ByteArrayInputStream(data));
             try
-            {
+            (InputStream stream = new DynaByteInputStream(
+                    new ByteArrayInputStream(data))) {
                 // Read complex settings
                 final int settings = stream.read();
                 final boolean hasSector = (settings & 1) == 1;
@@ -1509,10 +1483,6 @@ public class Complex implements Serializable, GameProvider
     
                 return true;
             }
-            finally
-            {
-                stream.close();
-            }
         }
         catch (final Exception e)
         {
@@ -1535,10 +1505,9 @@ public class Complex implements Serializable, GameProvider
             final byte[] data =
                 DatatypeConverter.parseBase64Binary(templateCode.trim());
 
-            final InputStream stream = new DynaByteInputStream(
-                new ByteArrayInputStream(data));
             try
-            {
+            (InputStream stream = new DynaByteInputStream(
+                    new ByteArrayInputStream(data))) {
                 // Read complex settings
                 final int settings = stream.read();
                 final boolean hasSector = (settings & 1) == 1;
@@ -1567,7 +1536,7 @@ public class Complex implements Serializable, GameProvider
                         game.getFactoryFactory().getFactory(factoryId);
                     if (factory.isMine())
                     {
-                        final List<Integer> yields = new ArrayList<Integer>();
+                        final List<Integer> yields = new ArrayList<>();
                         int yield;
                         while ((yield = stream.read()) != 0)
                             yields.add(yield - 1);
@@ -1583,10 +1552,6 @@ public class Complex implements Serializable, GameProvider
                 }
     
                 return complex;
-            }
-            finally
-            {
-                stream.close();
             }
         }
         catch (final IOException e)
@@ -1606,45 +1571,45 @@ public class Complex implements Serializable, GameProvider
         {
             final ByteArrayOutputStream arrayStream =
                 new ByteArrayOutputStream();
-            final OutputStream stream = new DynaByteOutputStream(arrayStream);
-
             // Write the template settings bit mask.
-            int settings = this.sector == null ? 0 : 1;
-            settings |= this.game.getNid() << 1;
-            stream.write(settings);
-
-            // Write the sector coordinates
-            if (this.sector != null)
-            {
-                stream.write(this.sector.getX());
-                stream.write(this.sector.getY());
-            }
-
-            // Or else write the sun power
-            else
-            {
-                stream.write(this.suns.getPercent());
-            }
-
-            // Write the factories
-            for (final ComplexFactory complexFactory: getAllFactories())
-            {
-                if (complexFactory.isDisabled()) continue;
-                final Factory factory = complexFactory.getFactory();
-                stream.write(factory.getNid());
-                if (factory.isMine())
+            try (OutputStream stream = new DynaByteOutputStream(arrayStream)) {
+                // Write the template settings bit mask.
+                int settings = this.sector == null ? 0 : 1;
+                settings |= this.game.getNid() << 1;
+                stream.write(settings);
+                
+                // Write the sector coordinates
+                if (this.sector != null)
                 {
-                    for (final int yield: complexFactory.getYields())
-                        stream.write(yield + 1);
-                    stream.write(0);
+                    stream.write(this.sector.getX());
+                    stream.write(this.sector.getY());
                 }
+                
+                // Or else write the sun power
                 else
-                    stream.write(complexFactory.getQuantity());
+                {
+                    stream.write(this.suns.getPercent());
+                }
+                
+                // Write the factories
+                for (final ComplexFactory complexFactory: getAllFactories())
+                {
+                    if (complexFactory.isDisabled()) continue;
+                    final Factory factory = complexFactory.getFactory();
+                    stream.write(factory.getNid());
+                    if (factory.isMine())
+                    {
+                        for (final int yield: complexFactory.getYields())
+                            stream.write(yield + 1);
+                        stream.write(0);
+                    }
+                    else
+                        stream.write(complexFactory.getQuantity());
+                }
+                
+                // Write end marker
+                stream.write(0);
             }
-
-            // Write end marker
-            stream.write(0);
-            stream.close();
 
             // Get byte array from stream
             final byte[] data = arrayStream.toByteArray();
@@ -1665,9 +1630,7 @@ public class Complex implements Serializable, GameProvider
      */
     public boolean hasMines()
     {
-        for (final ComplexFactory factory: this.factories)
-            if (factory.getFactory().isMine()) return true;
-        return false;
+        return this.factories.stream().anyMatch((factory) -> (factory.getFactory().isMine()));
     }
 
     /**
@@ -1686,12 +1649,12 @@ public class Complex implements Serializable, GameProvider
         out.println(getGame().getName());
 
         // Print the sector name if chosen
-        final Sector sector = getSector();
-        if (sector != null)
+        final Sector localSector = getSector();
+        if (localSector != null)
         {
             out.print(I18N.getString("complex.sector"));
             out.print(": ");
-            out.println(sector.getName());
+            out.println(localSector.getName());
         }
 
         // Print the sun power
@@ -1709,11 +1672,8 @@ public class Complex implements Serializable, GameProvider
         // Print factories
         out.print(I18N.getString("complex.factories"));
         out.println(":");
-        for (final ComplexFactory complexFactory: getAllFactories())
-        {
-            if (complexFactory.isDisabled()) continue;
+        getAllFactories().stream().filter((complexFactory) -> !(complexFactory.isDisabled())).map((complexFactory) -> {
             final Factory factory = complexFactory.getFactory();
-
             out.print(complexFactory.getQuantity());
             out.print("x ");
             out.print(factory.getName());
@@ -1733,8 +1693,10 @@ public class Complex implements Serializable, GameProvider
                     first = false;
                 }
             }
+            return complexFactory;
+        }).forEach((_item) -> {
             out.println(")");
-        }
+        });
 
         out.println();
 

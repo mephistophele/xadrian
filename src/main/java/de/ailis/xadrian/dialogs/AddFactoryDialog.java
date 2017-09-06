@@ -185,6 +185,7 @@ public class AddFactoryDialog extends ModalDialog implements
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override
@@ -253,11 +254,11 @@ public class AddFactoryDialog extends ModalDialog implements
      */
     private void redraw()
     {
-        final Map<String, Object> model = new HashMap<String, Object>();
-        model.put("factories", this.factories == null ? new Object[0]
+        final Map<String, Object> localModel = new HashMap<String, Object>();
+        localModel.put("factories", this.factories == null ? new Object[0]
             : this.factories);
         final String content = TemplateFactory.processTemplate(template,
-            model);
+            localModel);
         this.textPane.setText(content);
         this.textPane.setCaretPosition(0);
     }

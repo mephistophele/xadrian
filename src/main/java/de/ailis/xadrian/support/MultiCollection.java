@@ -76,9 +76,7 @@ public class MultiCollection<T> implements Collection<T>
     @Override
     public boolean containsAll(final Collection<?> c)
     {
-        for (final Object object: c)
-            if (!this.contains(object)) return false;
-        return true;
+        return c.stream().noneMatch((object) -> (!this.contains((T)object)));
     }
 
     /**
@@ -100,7 +98,7 @@ public class MultiCollection<T> implements Collection<T>
     @Override
     public Iterator<T> iterator()
     {
-        return new MultiIterator<T>(this.collections);
+        return new MultiIterator<>(this.collections);
     }
 
     /**
@@ -152,12 +150,13 @@ public class MultiCollection<T> implements Collection<T>
     }
 
     /**
+     * @param <E>
      * @see java.util.Collection#toArray(Object[])
      */
     @Override
     public <E> E[] toArray(final E[] a)
     {
-        final ArrayList<T> list = new ArrayList<T>(this.size());
+        final ArrayList<T> list = new ArrayList<>(this.size());
         for (final Collection<T> collection: this.collections)
         {
             list.addAll(collection);

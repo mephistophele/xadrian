@@ -20,7 +20,7 @@ import java.util.List;
 public class TextRenderer
 {
     /** The text lines */
-    private final List<TextLine> lines = new ArrayList<TextLine>();
+    private final List<TextLine> lines = new ArrayList<>();
 
     /** The current text line */
     private TextLine currentLine = null;
@@ -143,7 +143,7 @@ public class TextRenderer
     static class TextLine
     {
         /** The text parts in this line */
-        private final List<TextPart> parts = new ArrayList<TextPart>();
+        private final List<TextPart> parts = new ArrayList<>();
 
         /**
          * Adds a text part.

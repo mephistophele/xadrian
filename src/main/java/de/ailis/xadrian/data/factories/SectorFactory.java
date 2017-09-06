@@ -43,10 +43,10 @@ public class SectorFactory implements Serializable
     private final Game game;
 
     /** The sectors (sorted) */
-    private final SortedSet<Sector> sectors = new TreeSet<Sector>();
+    private final SortedSet<Sector> sectors = new TreeSet<>();
 
     /** The sector map (for quick ID navigation) */
-    private final Map<String, Sector> sectorMap = new HashMap<String, Sector>();
+    private final Map<String, Sector> sectorMap = new HashMap<>();
 
     /** The maximum X position */
     private int maxX = 0;
@@ -120,7 +120,7 @@ public class SectorFactory implements Serializable
 
                 final Sector sector;
                 final List<?> switches = element.elements("switch");
-                if (switches.size() == 0)
+                if (switches.isEmpty())
                 {
                     final boolean shipyard = hasShipyard(element);
                     final Asteroid[] asteroids = getAsteroids(element);
@@ -177,15 +177,10 @@ public class SectorFactory implements Serializable
         final Element stationsElement = element.element("stations");
         if (stationsElement != null)
         {
-            for (final Object stationItem : stationsElement
-                .elements("station"))
-            {
-                final Element stationElement = (Element) stationItem;
-                if (stationElement.attributeValue("class").equals(
-                    "bigShipyard"))
-                {
-                    return true;
-                }
+            if (stationsElement
+                    .elements("station").stream().anyMatch((stationElement) -> ((Element)stationElement).attributeValue("class").equals(
+                            "bigShipyard"))) {
+                return true;
             }
         }
         return false;

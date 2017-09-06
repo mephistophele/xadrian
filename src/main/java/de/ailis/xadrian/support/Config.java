@@ -72,7 +72,7 @@ public final class Config
     private static final Config instance = new Config();
 
     /** The ignored manufacturer races */
-    private final List<String> ignoredRaces = new ArrayList<String>();
+    private final List<String> ignoredRaces = new ArrayList<>();
 
     /** The last file chooser path */
     private File lastFileChooserPath = null;
@@ -149,12 +149,12 @@ public final class Config
         this.nightMode = prefs.getBoolean(NIGHT_MODE, false);
         this.prodStatsPerMinute = prefs.getBoolean(PROD_STATS_PER_MINUTE, false);
 
-        final String printAttributes = prefs.get(PRINT_ATTRIBUTES, null);
-        if (printAttributes != null && !printAttributes.isEmpty())
+        final String localPrintAttributes = prefs.get(PRINT_ATTRIBUTES, null);
+        if (localPrintAttributes != null && !localPrintAttributes.isEmpty())
         {
             this.printAttributes =
                 (HashPrintRequestAttributeSet) ObjectUtils
-                    .fromString(printAttributes);
+                    .fromString(localPrintAttributes);
         }
     }
 
@@ -181,11 +181,10 @@ public final class Config
         else
         {
             final StringBuilder builder = new StringBuilder();
-            for (final String raceId: this.ignoredRaces)
-            {
+            this.ignoredRaces.stream().forEach((raceId) -> {
                 if (builder.length() > 0) builder.append(' ');
                 builder.append(raceId);
-            }
+            });
             prefs.put(IGNORED_RACES, builder.toString());
         }
         if (this.lastFileChooserPath != null)

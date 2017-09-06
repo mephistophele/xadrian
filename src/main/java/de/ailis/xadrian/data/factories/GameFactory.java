@@ -32,13 +32,13 @@ import de.ailis.xadrian.frames.SplashFrame;
 public class GameFactory
 {
     /** The game map (for quick textual ID navigation) */
-    private final Map<String, Game> gameMap = new HashMap<String, Game>();
+    private final Map<String, Game> gameMap = new HashMap<>();
 
     /** The game map (for quick numeric ID navigation) */
-    private final Map<Integer, Game> gameNidMap = new HashMap<Integer, Game>();
+    private final Map<Integer, Game> gameNidMap = new HashMap<>();
 
     /** The games (sorted) */
-    private final SortedSet<Game> games = new TreeSet<Game>();
+    private final SortedSet<Game> games = new TreeSet<>();
 
     /** The singleton instance */
     private final static GameFactory instance = new GameFactory();
@@ -75,9 +75,9 @@ public class GameFactory
         try
         {
             final Document document = reader.read(url);
-            List<Object> games = document.getRootElement().elements("game");
-            SplashFrame.setNumberOfGames(games.size());
-            for (final Object item : games)
+            List<Object> localGames = document.getRootElement().elements("game");
+            SplashFrame.setNumberOfGames(localGames.size());
+            for (final Object item : localGames)
             {
                 final Element element = (Element) item;
                 final String id = element.attributeValue("id");

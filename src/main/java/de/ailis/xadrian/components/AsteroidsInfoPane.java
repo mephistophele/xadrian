@@ -83,7 +83,7 @@ public class AsteroidsInfoPane extends JComponent implements SectorProvider
      */
     private void redraw()
     {
-        final Map<String, Object> model = new HashMap<String, Object>();
+        final Map<String, Object> model = new HashMap<>();
         model.put("sector", this.sector);
         final String content = TemplateFactory.processTemplate(template,
             model);

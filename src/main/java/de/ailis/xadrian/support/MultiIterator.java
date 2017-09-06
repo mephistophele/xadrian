@@ -34,13 +34,13 @@ public class MultiIterator<T> implements Iterator<T>
      */
     public MultiIterator(final Collection<T>[] collections)
     {
-        final List<Iterator<T>> iterators =
-            new ArrayList<Iterator<T>>(collections.length);
+        final List<Iterator<T>> localIterators =
+            new ArrayList<>(collections.length);
         for (final Collection<T> collection: collections)
         {
-            iterators.add(collection.iterator());
+            localIterators.add(collection.iterator());
         }
-        this.iterators = iterators.iterator();
+        this.iterators = localIterators.iterator();
         if (this.iterators.hasNext())
             this.current = this.iterators.next();
         else

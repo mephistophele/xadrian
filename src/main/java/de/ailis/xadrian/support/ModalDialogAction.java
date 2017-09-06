@@ -43,6 +43,7 @@ public class ModalDialogAction extends BaseAction
     }
 
     /**
+     * @param e
      * @see ActionListener#actionPerformed(ActionEvent)
      */
     @Override

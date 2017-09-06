@@ -40,10 +40,10 @@ public class RaceFactory implements Serializable
     private final Game game;
 
     /** The race map (for quick ID navigation) */
-    private final Map<String, Race> raceMap = new HashMap<String, Race>();
+    private final Map<String, Race> raceMap = new HashMap<>();
 
     /** The races (sorted) */
-    private final SortedSet<Race> races = new TreeSet<Race>();
+    private final SortedSet<Race> races = new TreeSet<>();
 
     /**
      * Constructor.
@@ -106,13 +106,12 @@ public class RaceFactory implements Serializable
      */
     public Collection<Race> getManufacturerRaces()
     {
-        final Collection<Race> races = new ArrayList<Race>();
+        final Collection<Race> localRaces = new ArrayList<>();
         final FactoryFactory factory = this.game.getFactoryFactory();
-        for (final Race race : this.races)
-        {
-            if (factory.getFactories(race).size() > 0) races.add(race);
-        }
-        return races;
+        this.races.stream().filter((race) -> (factory.getFactories(race).size() > 0)).forEach((race) -> {
+            localRaces.add(race);
+        });
+        return localRaces;
     }
 
     /**

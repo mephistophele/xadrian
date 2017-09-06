@@ -37,10 +37,10 @@ public class SunFactory implements Serializable
     private final Game game;
 
     /** The Suns map (percent to Suns). */
-    private final Map<Integer, Sun> sunMap = new HashMap<Integer, Sun>();
+    private final Map<Integer, Sun> sunMap = new HashMap<>();
 
     /** The suns (sorted). */
-    private final SortedSet<Sun> suns = new TreeSet<Sun>();
+    private final SortedSet<Sun> suns = new TreeSet<>();
 
     /** The default suns. */
     private Sun defaultSuns;
@@ -78,13 +78,13 @@ public class SunFactory implements Serializable
                     .attributeValue("percent"));
                 final int cycle = Integer.parseInt(element
                     .attributeValue("cycle"));
-                final Sun suns = new Sun(this.game, percent, cycle);
+                final Sun localSuns = new Sun(this.game, percent, cycle);
                 if (this.defaultSuns == null
                     || Boolean.parseBoolean(element
                         .attributeValue("default", "false")))
-                    this.defaultSuns = suns;
-                this.suns.add(suns);
-                this.sunMap.put(percent, suns);
+                    this.defaultSuns = localSuns;
+                this.suns.add(localSuns);
+                this.sunMap.put(percent, localSuns);
             }
         }
         catch (final DocumentException e)

@@ -7,7 +7,6 @@ package de.ailis.xadrian.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -79,9 +78,9 @@ public class SelectSectorDialog extends ModalDialog
         final JPanel selectorPanel = new JPanel(new BorderLayout());
         selectorPanel.setBorder(BorderFactory
             .createBevelBorder(BevelBorder.LOWERED));
-        final SectorSelector selector = new SectorSelector(this.game);
-        this.selector = selector;
-        selector.addMouseListener(new MouseAdapter()
+        final SectorSelector localSelector = new SectorSelector(this.game);
+        this.selector = localSelector;
+        localSelector.addMouseListener(new MouseAdapter()
         {
             /** @see MouseAdapter#mouseClicked(MouseEvent) */
             @Override
@@ -91,38 +90,33 @@ public class SelectSectorDialog extends ModalDialog
                     getRootPane().getDefaultButton().doClick(0);
             }
         });
-        selectorPanel.add(selector, BorderLayout.CENTER);
+        selectorPanel.add(localSelector, BorderLayout.CENTER);
 
         // Create the controls panel
         final JPanel controlsPanel = new JPanel();
         controlsPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.X_AXIS));
-        final JTextField quickSearch = new JTextField();
-        this.quickSearch = quickSearch;
-        quickSearch.setColumns(15);
-        quickSearch.addKeyListener(new KeyAdapter()
+        final JTextField localQuickSearch = new JTextField();
+        this.quickSearch = localQuickSearch;
+        localQuickSearch.setColumns(15);
+        localQuickSearch.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyReleased(final KeyEvent e)
             {
-                selector.setFilter(quickSearch.getText());
+                localSelector.setFilter(localQuickSearch.getText());
             }
         });
         final JLabel quickSearchLabel = new JLabel(I18N
             .getString("dialog.selectSector.filter"));
         quickSearchLabel.setDisplayedMnemonic(I18N
             .getMnemonic("dialog.selectSector.filter"));
-        quickSearchLabel.setLabelFor(quickSearch);
+        quickSearchLabel.setLabelFor(localQuickSearch);
         final JComboBox modeComboBox = new JComboBox(SectorSelector.Mode
             .values());
-        modeComboBox.setSelectedItem(selector.getMode());
-        modeComboBox.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                selector.setMode((Mode) modeComboBox.getSelectedItem());
-            }
+        modeComboBox.setSelectedItem(localSelector.getMode());
+        modeComboBox.addActionListener((final ActionEvent e) -> {
+            localSelector.setMode((Mode) modeComboBox.getSelectedItem());
         });
         final JLabel modeLabel = new JLabel(I18N
             .getString("dialog.selectSector.viewMode"));
@@ -131,7 +125,7 @@ public class SelectSectorDialog extends ModalDialog
         modeLabel.setLabelFor(modeComboBox);
         controlsPanel.add(quickSearchLabel);
         controlsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        controlsPanel.add(quickSearch);
+        controlsPanel.add(localQuickSearch);
         controlsPanel.add(Box.createRigidArea(new Dimension(50, 0)));
         controlsPanel.add(modeLabel);
         controlsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -171,6 +165,7 @@ public class SelectSectorDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override

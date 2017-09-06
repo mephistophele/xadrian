@@ -34,6 +34,7 @@ public class DynaByteOutputStream extends OutputStream
     }
 
     /**
+     * @throws java.io.IOException
      * @see java.io.OutputStream#write(int)
      */
     @Override

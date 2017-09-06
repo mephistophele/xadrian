@@ -144,9 +144,8 @@ public class PreferencesDialog extends ModalDialog
         c.weightx = 1;
         c.gridx = 0;
         c.gridy = 0;
-        this.racesCheckBoxes = new HashMap<Race, JCheckBox>();
-        for (final Race race : getIgnorableRaces())
-        {
+        this.racesCheckBoxes = new HashMap<>();
+        getIgnorableRaces().stream().map((race) -> {
             final JCheckBox raceCheckBox = new JCheckBox(race.getName());
             if (c.gridx == 3)
             {
@@ -155,8 +154,10 @@ public class PreferencesDialog extends ModalDialog
             }
             racePanel.add(raceCheckBox, c);
             this.racesCheckBoxes.put(race, raceCheckBox);
+            return race;
+        }).forEach((_item) -> {
             c.gridx++;
-        }
+        });
         panel.add(racePanel);
         return panel;
     }
@@ -168,14 +169,12 @@ public class PreferencesDialog extends ModalDialog
      */
     private SortedSet<Race> getIgnorableRaces()
     {
-        final SortedSet<Race> races = new TreeSet<Race>();
-        for (final Game game : GameFactory.getInstance().getGames())
-        {
-            for (final Race race : game.getRaceFactory().getManufacturerRaces())
-            {
+        final SortedSet<Race> races = new TreeSet<>();
+        GameFactory.getInstance().getGames().stream().forEach((game) -> {
+            game.getRaceFactory().getManufacturerRaces().stream().forEach((race) -> {
                 races.add(race);
-            }
-        }
+            });
+        });
         return races;
     }
 
@@ -307,10 +306,9 @@ public class PreferencesDialog extends ModalDialog
         this.gamesComboBox = new JComboBox();
         this.gamesComboBox.addItem(I18N
             .getString("dialog.preferences.alwaysAsk"));
-        for (final Game game : GameFactory.getInstance().getGames())
-        {
+        GameFactory.getInstance().getGames().stream().forEach((game) -> {
             this.gamesComboBox.addItem(game);
-        }
+        });
         controlPanel.add(this.gamesComboBox, c);
         c.fill = GridBagConstraints.NONE;
         panel.add(controlPanel);
@@ -353,10 +351,9 @@ public class PreferencesDialog extends ModalDialog
         c.insets.left = 5;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.themeComboBox = new JComboBox();
-        for (final Theme theme : ThemeFactory.getInstance().getThemes())
-        {
+        ThemeFactory.getInstance().getThemes().stream().forEach((theme) -> {
             this.themeComboBox.addItem(theme);
-        }
+        });
         controlPanel.add(this.themeComboBox, c);
         c.insets.left = 0;
         c.fill = GridBagConstraints.NONE;
@@ -436,6 +433,7 @@ public class PreferencesDialog extends ModalDialog
     }
 
     /**
+     * @return 
      * @see de.ailis.xadrian.support.ModalDialog#open()
      */
     @Override
@@ -444,13 +442,12 @@ public class PreferencesDialog extends ModalDialog
         final Config config = Config.getInstance();
 
         // Load preference values
-        for (final Map.Entry<Race, JCheckBox> entry : this.racesCheckBoxes
-            .entrySet())
-        {
-            final Race race = entry.getKey();
-            final JCheckBox checkBox = entry.getValue();
-            checkBox.setSelected(!config.isRaceIgnored(race));
-        }
+        this.racesCheckBoxes
+                .entrySet().stream().forEach((entry) -> {
+                    final Race race = entry.getKey();
+                    final JCheckBox checkBox = entry.getValue();
+                    checkBox.setSelected(!config.isRaceIgnored(race));
+        });
         this.showFactoryResourcesCheckBox.setSelected(config
             .isShowFactoryResources());
         this.nightModeCheckBox.setSelected(config
@@ -476,17 +473,15 @@ public class PreferencesDialog extends ModalDialog
         if (result == Result.OK)
         {
             // Save preference values
-            for (final Map.Entry<Race, JCheckBox> entry : this.racesCheckBoxes
-                .entrySet())
-            {
-                final Race race = entry.getKey();
-                final JCheckBox checkBox = entry.getValue();
-                config.setRaceIgnored(race, !checkBox.isSelected());
-            }
-            for (final Game game : GameFactory.getInstance().getGames())
-            {
+            this.racesCheckBoxes
+                    .entrySet().stream().forEach((entry) -> {
+                        final Race race = entry.getKey();
+                        final JCheckBox checkBox = entry.getValue();
+                        config.setRaceIgnored(race, !checkBox.isSelected());
+            });
+            GameFactory.getInstance().getGames().stream().forEach((game) -> {
                 game.getAddFactoryDialog().resetFactoriesTreeModel();
-            }
+            });
             config.setShowFactoryResources(this.showFactoryResourcesCheckBox
                 .isSelected());
             config.setNightMode(this.nightModeCheckBox.isSelected());

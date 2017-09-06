@@ -37,10 +37,10 @@ public class AsteroidSelectionModel implements Serializable, SectorProvider
     private Sector sector;
 
     /** The selected asteroid */
-    private final List<Asteroid> selection = new ArrayList<Asteroid>();
+    private final List<Asteroid> selection = new ArrayList<>();
 
     /** The rest of the yields which could not be mapped to asteroids */
-    private final List<Integer> restYields = new ArrayList<Integer>();
+    private final List<Integer> restYields = new ArrayList<>();
 
     /** The focused asteroid */
     private Asteroid focused;
@@ -96,11 +96,9 @@ public class AsteroidSelectionModel implements Serializable, SectorProvider
      */
     private void backupYields()
     {
-        for (final Asteroid asteroid: this.selection)
-        {
-            final int yield = asteroid.getYield(this.ware);
+        this.selection.stream().map((asteroid) -> asteroid.getYield(this.ware)).forEach((yield) -> {
             this.restYields.add(yield);
-        }
+        });
     }
 
     /**
@@ -111,7 +109,7 @@ public class AsteroidSelectionModel implements Serializable, SectorProvider
         // Do nothing if no sector is set
         if (this.sector == null) return;
 
-        for (final Integer yield: new ArrayList<Integer>(this.restYields))
+        for (final Integer yield: new ArrayList<>(this.restYields))
         {
             for (final Asteroid asteroid: this.sector.getAsteroids())
             {

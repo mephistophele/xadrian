@@ -33,6 +33,7 @@ public class DoubleClickAction extends MouseAdapter
     }
 
     /**
+     * @param e
      * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
      */
     @Override

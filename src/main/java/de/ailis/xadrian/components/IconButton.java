@@ -34,6 +34,10 @@ public class IconButton extends JLabel
     public IconButton(final Action action, Icon icon)
     {
         super(icon);
+        initComponents(action);
+    }
+    
+    private void initComponents(Action action){
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setToolTipText((String) action.getValue(Action.SHORT_DESCRIPTION));
         addMouseListener(new MouseAdapter()

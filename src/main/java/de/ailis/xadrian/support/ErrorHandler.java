@@ -25,6 +25,7 @@ import de.ailis.xadrian.Main;
 public class ErrorHandler extends EventQueue
 {
     /**
+     * @param newEvent
      * @see java.awt.EventQueue#dispatchEvent(java.awt.AWTEvent)
      */
     @Override
@@ -53,25 +54,25 @@ public class ErrorHandler extends EventQueue
 
         // Build an error message to display in a dialog
         StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-        String title = t.getMessage();
-        if (title == null) title = "Error";
-        writer.println(title);
-        writer.println();
-        String packageName = Main.class.getPackage().getName() + ".";
-        Throwable current = t;
-        while (current != null)
-        {
-            writer.println(t.toString());
-            for (StackTraceElement e : current.getStackTrace())
+        try (PrintWriter writer = new PrintWriter(stringWriter)) {
+            String title = t.getMessage();
+            if (title == null) title = "Error";
+            writer.println(title);
+            writer.println();
+            String packageName = Main.class.getPackage().getName() + ".";
+            Throwable current = t;
+            while (current != null)
             {
-                writer.print("    ");
-                writer.println(e.toString());
-                if (e.getClassName().startsWith(packageName)) break;
+                writer.println(t.toString());
+                for (StackTraceElement e : current.getStackTrace())
+                {
+                    writer.print("    ");
+                    writer.println(e.toString());
+                    if (e.getClassName().startsWith(packageName)) break;
+                }
+                current = current.getCause();
             }
-            current = current.getCause(); 
         }
-        writer.close();
         String message = stringWriter.toString();
 
         // Copy error message into the clipboard

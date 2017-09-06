@@ -463,15 +463,15 @@ public class Sector implements Serializable, Comparable<Sector>
      */
     public Asteroid[] getSiliconAsteroids()
     {
-        final SortedSet<Asteroid> asteroids = new TreeSet<Asteroid>();
+        final SortedSet<Asteroid> localAsteroids = new TreeSet<Asteroid>();
         for (final Asteroid asteroid : getAsteroids())
         {
             if (asteroid.getWare().isSiliconWafers())
             {
-                asteroids.add(asteroid);
+                localAsteroids.add(asteroid);
             }
         }
-        return asteroids.toArray(new Asteroid[asteroids.size()]);
+        return localAsteroids.toArray(new Asteroid[localAsteroids.size()]);
     }
 
     /**
@@ -481,15 +481,15 @@ public class Sector implements Serializable, Comparable<Sector>
      */
     public Asteroid[] getOreAsteroids()
     {
-        final SortedSet<Asteroid> asteroids = new TreeSet<Asteroid>();
+        final SortedSet<Asteroid> localAsteroids = new TreeSet<Asteroid>();
         for (final Asteroid asteroid : getAsteroids())
         {
             if (asteroid.getWare().isOre())
             {
-                asteroids.add(asteroid);
+                localAsteroids.add(asteroid);
             }
         }
-        return asteroids.toArray(new Asteroid[asteroids.size()]);
+        return localAsteroids.toArray(new Asteroid[localAsteroids.size()]);
     }
 
     /**
@@ -499,15 +499,15 @@ public class Sector implements Serializable, Comparable<Sector>
      */
     public Asteroid[] getIceAsteroids()
     {
-        final SortedSet<Asteroid> asteroids = new TreeSet<Asteroid>();
+        final SortedSet<Asteroid> localAsteroids = new TreeSet<Asteroid>();
         for (final Asteroid asteroid : getAsteroids())
         {
             if (asteroid.getWare().isIce())
             {
-                asteroids.add(asteroid);
+                localAsteroids.add(asteroid);
             }
         }
-        return asteroids.toArray(new Asteroid[asteroids.size()]);
+        return localAsteroids.toArray(new Asteroid[localAsteroids.size()]);
     }
 
     /**
@@ -517,15 +517,15 @@ public class Sector implements Serializable, Comparable<Sector>
      */
     public Asteroid[] getNividiumAsteroids()
     {
-        final SortedSet<Asteroid> asteroids = new TreeSet<Asteroid>();
+        final SortedSet<Asteroid> localAsteroids = new TreeSet<Asteroid>();
         for (final Asteroid asteroid : getAsteroids())
         {
             if (asteroid.getWare().isNividium())
             {
-                asteroids.add(asteroid);
+                localAsteroids.add(asteroid);
             }
         }
-        return asteroids.toArray(new Asteroid[asteroids.size()]);
+        return localAsteroids.toArray(new Asteroid[localAsteroids.size()]);
     }
 
     /**

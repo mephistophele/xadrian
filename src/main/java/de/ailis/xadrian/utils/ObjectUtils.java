@@ -45,7 +45,7 @@ public final class ObjectUtils
                 DatatypeConverter.parseBase64Binary(s)))
                 .readObject();
         }
-        catch (Exception e)
+        catch (IOException | ClassNotFoundException e)
         {
             // Can't happen
             throw new RuntimeException(e.toString(), e);
@@ -63,16 +63,14 @@ public final class ObjectUtils
     {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try
-        {
-            ObjectOutputStream objectStream = new ObjectOutputStream(stream);
+        (ObjectOutputStream objectStream = new ObjectOutputStream(stream)) {
             objectStream.writeObject(o);
-            objectStream.close();
-            return DatatypeConverter.printBase64Binary(stream.toByteArray());
         }
         catch (IOException e)
         {
             // Can't happen
             throw new RuntimeException(e.toString(), e);
         }
+        return DatatypeConverter.printBase64Binary(stream.toByteArray());
     }
 }

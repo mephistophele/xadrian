@@ -23,10 +23,10 @@ import de.ailis.xadrian.data.Theme;
 public class ThemeFactory
 {
     /** The theme map  */
-    private final Map<String, Theme> themeMap = new HashMap<String, Theme>();
+    private final Map<String, Theme> themeMap = new HashMap<>();
 
     /** The themes (sorted) */
-    private final SortedSet<Theme> themes = new TreeSet<Theme>();
+    private final SortedSet<Theme> themes = new TreeSet<>();
 
     /** The singleton instance. */
     private final static ThemeFactory instance = new ThemeFactory();

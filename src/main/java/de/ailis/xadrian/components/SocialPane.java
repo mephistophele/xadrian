@@ -31,6 +31,10 @@ public class SocialPane extends JComponent
     public SocialPane()
     {
         super();
+        initComponents();
+    }
+    
+    private void initComponents(){
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
        

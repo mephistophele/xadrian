@@ -15,7 +15,6 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +32,6 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.ailis.xadrian.data.Complex;
 import de.ailis.xadrian.data.Game;
@@ -56,7 +54,7 @@ final public class ChangePricesDialog extends ModalDialog
 
     /** The map with custom prices */
     private final Map<Ware, Integer> customPrices =
-        new HashMap<Ware, Integer>();
+        new HashMap<>();
 
     /** The ware prices panel */
     private JPanel warePricesPanel;
@@ -99,16 +97,16 @@ final public class ChangePricesDialog extends ModalDialog
         this.warePricesPanel.setLayout(new GridBagLayout());
         this.warePricesPanel.setBackground(Color.WHITE);
 
-        final JScrollPane scrollPane = new JScrollPane(this.warePricesPanel);
-        scrollPane.setBorder(BorderFactory
+        final JScrollPane localScrollPane = new JScrollPane(this.warePricesPanel);
+        localScrollPane.setBorder(BorderFactory
             .createBevelBorder(BevelBorder.LOWERED));
-        scrollPane.setPreferredSize(new Dimension(720, 512));
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        this.scrollPane = scrollPane;
+        localScrollPane.setPreferredSize(new Dimension(720, 512));
+        localScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        this.scrollPane = localScrollPane;
 
         final JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(localScrollPane, BorderLayout.CENTER);
 
         // Put this last panel into the window
         add(contentPanel, BorderLayout.CENTER);
@@ -251,57 +249,37 @@ final public class ChangePricesDialog extends ModalDialog
             this.warePricesPanel.add(buttonPanel, c);
 
             // Setup events
-            slider.addChangeListener(new ChangeListener()
-            {
-                @Override
-                public void stateChanged(final ChangeEvent e)
-                {
-                    spinner.setValue(slider.getValue());
-                }
+            slider.addChangeListener((final ChangeEvent e) -> {
+                spinner.setValue(slider.getValue());
             });
-            spinner.addChangeListener(new ChangeListener()
-            {
-                @Override
-                public void stateChanged(final ChangeEvent e)
-                {
-                    slider.setValue((Integer) spinner.getValue());
-                    resetButton.setEnabled(slider.getValue() != ware
+            spinner.addChangeListener((final ChangeEvent e) -> {
+                slider.setValue((Integer) spinner.getValue());
+                resetButton.setEnabled(slider.getValue() != ware
                         .getAvgPrice()
                         || !checkBox.isSelected());
-                    updateCustomWare(ware, checkBox.isSelected(), slider
+                updateCustomWare(ware, checkBox.isSelected(), slider
                         .getValue());
-                }
             });
-            checkBox.addChangeListener(new ChangeListener()
-            {
-                @Override
-                public void stateChanged(final ChangeEvent e)
-                {
-                    final boolean enabled = checkBox.isSelected();
-                    slider.setEnabled(enabled);
-                    spinner.setEnabled(enabled);
-                    credits.setEnabled(enabled);
-                    priceLabel.setEnabled(enabled);
-                    resetButton.setEnabled(slider.getValue() != ware
+            checkBox.addChangeListener((final ChangeEvent e) -> {
+                final boolean enabled1 = checkBox.isSelected();
+                slider.setEnabled(enabled1);
+                spinner.setEnabled(enabled1);
+                credits.setEnabled(enabled1);
+                priceLabel.setEnabled(enabled1);
+                resetButton.setEnabled(slider.getValue() != ware
                         .getAvgPrice()
                         || !checkBox.isSelected());
-                    updateCustomWare(ware, checkBox.isSelected(), slider
+                updateCustomWare(ware, checkBox.isSelected(), slider
                         .getValue());
-                }
             });
-            resetButton.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    checkBox.setSelected(true);
-                    slider.setValue(ware.getAvgPrice());
-                    resetButton.setEnabled(slider.getValue() != ware
+            resetButton.addActionListener((final ActionEvent e) -> {
+                checkBox.setSelected(true);
+                slider.setValue(ware.getAvgPrice());
+                resetButton.setEnabled(slider.getValue() != ware
                         .getAvgPrice()
                         || !checkBox.isSelected());
-                    updateCustomWare(ware, checkBox.isSelected(), slider
+                updateCustomWare(ware, checkBox.isSelected(), slider
                         .getValue());
-                }
             });
 
             c.gridy++;
@@ -386,6 +364,7 @@ final public class ChangePricesDialog extends ModalDialog
     }
     
     /**
+     * @return 
      * @deprecated This method is not supported by this dialog. Use the
      * {@link ChangePricesDialog#open(Complex)} method instead.
      */

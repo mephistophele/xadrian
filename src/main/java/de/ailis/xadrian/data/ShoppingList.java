@@ -20,19 +20,7 @@ public class ShoppingList implements Serializable
     private static final long serialVersionUID = -2174714813369451947L;
 
     /** The shopping list items */
-    private final List<ShoppingListItem> items = new ArrayList<ShoppingListItem>();
-
-    /** The total quantity */
-    private int totalQuantity = 0;
-
-    /** The total volume */
-    private long totalVolume = 0;
-
-    /** The total price */
-    private long totalPrice = 0;
-
-    /** The total built factories */
-    private int totalBuilt = 0;
+    private final List<ShoppingListItem> items = new ArrayList<>();
 
     /** The number of built kits */
     private int kitQuantityBuilt = 0;
@@ -65,10 +53,6 @@ public class ShoppingList implements Serializable
     {
         int i, max;
 
-        this.totalVolume += item.getTotalVolume();
-        this.totalQuantity += item.getQuantity();
-        this.totalPrice += item.getTotalPrice();
-
         // Try to update an existing list item first
         for (i = 0, max = this.items.size(); i < max; i++)
         {
@@ -85,7 +69,6 @@ public class ShoppingList implements Serializable
 
         // Add the new item
         this.items.add(item);
-        this.totalBuilt += item.getQuantityBuilt();
         Collections.sort(this.items);
     }
 
@@ -106,7 +89,7 @@ public class ShoppingList implements Serializable
      */
     public long getTotalVolume()
     {
-        return this.totalVolume + getTotalKitVolume();
+        return this.items.stream().mapToLong(item -> item.getTotalVolume()).sum() + getTotalKitVolume();
     }
     
     /**
@@ -117,11 +100,14 @@ public class ShoppingList implements Serializable
     public long getTotalRestVolume()
     {
         long volume = getRestKitVolume();
-        for (ShoppingListItem item: this.items)
-            volume += item.getRestVolume();
+        volume = this.items.stream().map((item) -> item.getRestVolume()).reduce(volume, (accumulator, _item) -> accumulator + _item);
         return volume;
     }
 
+    public int getFactoryTotalQuantity(){
+        return this.items.stream().mapToInt(item -> item.getQuantity()).sum();
+    }
+    
     /**
      * Returns the total quantity.
      *
@@ -129,7 +115,7 @@ public class ShoppingList implements Serializable
      */
     public int getTotalQuantity()
     {
-        return this.totalQuantity + getKitQuantity();
+        return getFactoryTotalQuantity() + getKitQuantity();
     }
 
     /**
@@ -139,7 +125,7 @@ public class ShoppingList implements Serializable
      */
     public int getTotalQuantityBuilt()
     {
-        return this.totalBuilt + getKitQuantityBuilt();
+        return this.items.stream().mapToInt(item -> item.getQuantityBuilt()).sum() + getKitQuantityBuilt();
     }
 
     /**
@@ -159,7 +145,7 @@ public class ShoppingList implements Serializable
      */
     public long getTotalPrice()
     {
-        return this.totalPrice + getTotalKitPrice();
+        return this.items.stream().mapToLong(item -> item.getTotalPrice()).sum() + getTotalKitPrice();
     }
 
     /**
@@ -170,8 +156,7 @@ public class ShoppingList implements Serializable
     public long getTotalRestPrice()
     {
         long price = getRestKitPrice();
-        for (ShoppingListItem item: this.items)
-            price += item.getRestPrice();
+        price = this.items.stream().map((item) -> item.getRestPrice()).reduce(price, (accumulator, _item) -> accumulator + _item);
         return price;
     }
     /**
@@ -181,7 +166,7 @@ public class ShoppingList implements Serializable
      */
     public int getKitQuantity()
     {
-        return Math.max(0, this.totalQuantity - 1);
+        return Math.max(0, this.getFactoryTotalQuantity() - 1);
     }
 
     /**

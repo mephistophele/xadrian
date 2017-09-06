@@ -40,6 +40,7 @@ public class ChangePricesAction extends BaseAction implements StateListener
     }
 
     /**
+     * @param e
      * @see ActionListener#actionPerformed(ActionEvent)
      */
     @Override

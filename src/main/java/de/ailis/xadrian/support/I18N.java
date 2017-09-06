@@ -21,36 +21,39 @@ import de.ailis.xadrian.data.Game;
  *
  * @author Klaus Reimer (k@ailis.de)
  */
-public final class I18N
-{
-    /** The messages. */
+public final class I18N {
+
+    /**
+     * The messages.
+     */
     private static final ResourceBundle messages = ResourceBundle
-        .getBundle(Main.class.getPackage().getName() + ".messages");
+            .getBundle(Main.class.getPackage().getName() + ".messages");
 
-    /** The game messages. */
-    private static Map<String, ResourceBundle> gameMessages =
-        new HashMap<String, ResourceBundle>();
+    /**
+     * The game messages.
+     */
+    private static Map<String, ResourceBundle> gameMessages
+            = new HashMap<>();
 
-    /** The custom messages. */
-    private static ResourceBundle customMessages;
+    /**
+     * The custom messages.
+     */
+    private static final ResourceBundle customMessages;
 
-    static
-    {
-        try
-        {
-            customMessages = ResourceBundle.getBundle("messages");
-        }
-        catch (final MissingResourceException e)
-        {
-            customMessages = null;
+    static {
+        ResourceBundle tmp = null;
+        try {
+            tmp = ResourceBundle.getBundle("messages");
+        } catch (final MissingResourceException e) {
+        } finally {
+            customMessages = tmp;
         }
     }
 
     /**
      * Private constructor to prevent instantiation
      */
-    private I18N()
-    {
+    private I18N() {
         // Empty
     }
 
@@ -58,20 +61,16 @@ public final class I18N
      * Returns the message resource with the specified key. If not found then
      * null is returned.
      *
-     * @param key
-     *            The message resource key
+     * @param key The message resource key
      * @return The message resource value or null if not found
      */
-    private static String get(final String key)
-    {
-        try
-        {
-            if (customMessages != null && customMessages.containsKey(key))
+    private static String get(final String key) {
+        try {
+            if (customMessages != null && customMessages.containsKey(key)) {
                 return customMessages.getString(key);
+            }
             return messages.getString(key);
-        }
-        catch (final MissingResourceException e)
-        {
+        } catch (final MissingResourceException e) {
             return null;
         }
     }
@@ -80,37 +79,27 @@ public final class I18N
      * Returns the game message resource with the specified key. If not found
      * then null is returned.
      *
-     * @param game
-     *            The game.
-     * @param key
-     *            The message resource key
+     * @param game The game.
+     * @param key The message resource key
      * @return The message resource value or null if not found
      */
-    private static String get(final Game game, final String key)
-    {
+    private static String get(final Game game, final String key) {
         String gameId = game.getId();
         ResourceBundle bundle = gameMessages.get(gameId);
-        if (bundle == null)
-        {
-            try
-            {
-                bundle =
-                    ResourceBundle.getBundle(Main.class.getPackage().getName() +
-                        ".data." + gameId + ".messages");
-            }
-            catch (final MissingResourceException e)
-            {
-                bundle =
-                    ResourceBundle.getBundle(gameId + ".messages");
+        if (bundle == null) {
+            try {
+                bundle
+                        = ResourceBundle.getBundle(Main.class.getPackage().getName()
+                                + ".data." + gameId + ".messages");
+            } catch (final MissingResourceException e) {
+                bundle
+                        = ResourceBundle.getBundle(gameId + ".messages");
             }
             gameMessages.put(gameId, bundle);
         }
-        try
-        {
+        try {
             return bundle.getString(key);
-        }
-        catch (final MissingResourceException e)
-        {
+        } catch (final MissingResourceException e) {
             return null;
         }
     }
@@ -119,16 +108,15 @@ public final class I18N
      * Returns the message resource with the specified key. If not found then a
      * special string is returned indicating the missing message resource.
      *
-     * @param key
-     *            The message resource key
-     * @param args
-     *            Message arguments
+     * @param key The message resource key
+     * @param args Message arguments
      * @return The message resource value
      */
-    public static String getString(final String key, final Object... args)
-    {
+    public static String getString(final String key, final Object... args) {
         final String value = get(key);
-        if (value == null) return "???" + key + "???";
+        if (value == null) {
+            return "???" + key + "???";
+        }
         return String.format(value, args);
     }
 
@@ -137,31 +125,27 @@ public final class I18N
      * then a special string is returned indicating the missing message
      * resource.
      *
-     * @param game
-     *            The game.
-     * @param key
-     *            The message resource key
-     * @param args
-     *            Message arguments
+     * @param game The game.
+     * @param key The message resource key
+     * @param args Message arguments
      * @return The message resource value
      */
     public static String getString(final Game game, final String key,
-        final Object... args)
-    {
+            final Object... args) {
         final String value = get(game, key);
-        if (value == null) return "???" + key + "???";
+        if (value == null) {
+            return "???" + key + "???";
+        }
         return String.format(value, args);
     }
 
     /**
      * Returns a title message resource.
      *
-     * @param key
-     *            The base key of the message resource (without .title suffix)
+     * @param key The base key of the message resource (without .title suffix)
      * @return The title message resource value
      */
-    public static String getTitle(final String key)
-    {
+    public static String getTitle(final String key) {
         return getString(key + ".title");
     }
 
@@ -169,15 +153,15 @@ public final class I18N
      * Returns an accelerator message resource. If message resource is not found
      * or is empty then null is returned.
      *
-     * @param key
-     *            The base key of the message resource (without .accelerator
-     *            suffix)
+     * @param key The base key of the message resource (without .accelerator
+     * suffix)
      * @return The accelerator key stroke or null if not set
      */
-    public static KeyStroke getAccelerator(final String key)
-    {
+    public static KeyStroke getAccelerator(final String key) {
         final String value = get(key + ".accelerator");
-        if (value == null || value.length() == 0) return null;
+        if (value == null || value.length() == 0) {
+            return null;
+        }
         return KeyStroke.getKeyStroke(value);
     }
 
@@ -185,17 +169,19 @@ public final class I18N
      * Returns a mnemonic message resource. If message resource is not found or
      * is empty then null is returned.
      *
-     * @param key
-     *            The base key of the message resource (without .mnemonic
-     *            suffix)
+     * @param key The base key of the message resource (without .mnemonic
+     * suffix)
      * @return The mnemonic or 0 if not set
      */
-    public static int getMnemonic(final String key)
-    {
+    public static int getMnemonic(final String key) {
         final String value = get(key + ".mnemonic");
-        if (value == null || value.length() == 0) return 0;
+        if (value == null || value.length() == 0) {
+            return 0;
+        }
         int vk = value.charAt(0);
-        if (vk >= 'a' && vk <= 'z') vk -= ('a' - 'A');
+        if (vk >= 'a' && vk <= 'z') {
+            vk -= ('a' - 'A');
+        }
         return vk;
     }
 
@@ -203,12 +189,10 @@ public final class I18N
      * Returns a tool tip message resource. If not found or empty then null is
      * returned.
      *
-     * @param key
-     *            The base key of the message resource (without .tooltip suffix)
+     * @param key The base key of the message resource (without .tooltip suffix)
      * @return The tooltip message resource value
      */
-    public static String getToolTip(final String key)
-    {
+    public static String getToolTip(final String key) {
         return get(key + ".tooltip");
     }
 
@@ -216,14 +200,12 @@ public final class I18N
      * Creates a new menu and configures the title, accelerator, tooltip and
      * mnemonic automatically.
      *
-     * @param menuBar
-     *            The menu bar (or menu) to which the new menu should be added
-     * @param name
-     *            The menu name
+     * @param menuBar The menu bar (or menu) to which the new menu should be
+     * added
+     * @param name The menu name
      * @return The created menu
      */
-    public static JMenu createMenu(final JComponent menuBar, final String name)
-    {
+    public static JMenu createMenu(final JComponent menuBar, final String name) {
         final String key = "menu." + name;
         final JMenu menu = new JMenu(getTitle(key));
         menu.setMnemonic(getMnemonic(key));
