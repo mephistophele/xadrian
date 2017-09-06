@@ -11,6 +11,7 @@
         <move file="tmp/messages.properties" todir="." />
         <move file="tmp/messages_de.properties" todir="." />
         <move file="tmp/messages_pl.properties" todir="." />
+        <move file="tmp/messages_it.properties" todir="." />
         <delete dir="tmp" />
     </target>
 </project>
